@@ -1,0 +1,15 @@
+{
+  "name": "dragpaper-tools",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "hi@fragment0.com",
+  "license": "MIT",
+  "dependencies": {
+    "@types/isomorphic-fetch": "^0.0.34",
+    "@types/koa": "^2.0.46",
+    "@types/koa-router": "^7.0.31",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.11.0",
+    "typescript": "^3.0.1"
+  }
+}

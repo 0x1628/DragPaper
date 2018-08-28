@@ -1,0 +1,10 @@
+{
+  "name": "dragpaper",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "author": "hi@fragment0.com",
+  "license": "MIT"
+}
