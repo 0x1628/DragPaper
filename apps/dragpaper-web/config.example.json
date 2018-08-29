@@ -1,0 +1,10 @@
+{
+  "account": {
+    "username": "YOUR_NAME",
+    "password": "YOUR_PASSWORD"
+  },
+  "dropbox": {
+    "email": "YOUR_DROPBOX_ACCOUNT_EMAIL",
+    "folder": "YOUR_DROPBOX_FOLDER_ID"
+  }
+}

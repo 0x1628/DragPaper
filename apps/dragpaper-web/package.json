@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "hi@fragment0.com",
   "license": "MIT",
+  "scripts": {
+    "dev": "../../node_modules/.bin/nodemon -e ts -x ../../node_modules/.bin/ts-node src/index.ts"
+  },
   "dependencies": {
     "dropbox": "^4.0.9",
     "form-data": "^2.3.2",
