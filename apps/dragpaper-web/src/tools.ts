@@ -1,16 +1,22 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import * as crypto from 'crypto'
 
 const configFile = path.resolve(process.cwd(), 'config.json')
+let config:any = null
 
-export function readConfigSync() {
-  return JSON.parse(fs.readFileSync(configFile).toString())
+export function readConfigSync(refresh = false) {
+  if (!refresh && config) { return config }
+  config = JSON.parse(fs.readFileSync(configFile).toString())
+  return config
 }
 
-export function readConfig() {
+export function readConfig(refresh = false) {
   return new Promise((resolve) => {
+    if (!refresh && config) { resolve(config) }
     fs.readFile(configFile, (err, data) => {
-      resolve(JSON.parse(data.toString()))
+      config = JSON.parse(data.toString())
+      resolve(config)
     })
   })
 }
@@ -24,4 +30,10 @@ export function writeConfig(data: any) {
       resolve()
     })
   })
+}
+
+export function md5(str: string) {
+  const hash = crypto.createHash('md5')
+  hash.update(str)
+  return hash.digest('hex')
 }

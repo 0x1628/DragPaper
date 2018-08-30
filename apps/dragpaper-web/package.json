@@ -5,14 +5,17 @@
   "author": "hi@fragment0.com",
   "license": "MIT",
   "scripts": {
-    "dev": "../../node_modules/.bin/nodemon -e ts -x ../../node_modules/.bin/ts-node src/index.ts"
+    "dev": "DEBUG=DragPaper ../../node_modules/.bin/nodemon -e ts -x ../../node_modules/.bin/ts-node src/index.ts"
   },
   "dependencies": {
+    "debug": "^3.1.0",
     "dropbox": "^4.0.9",
     "form-data": "^2.3.2",
     "https-proxy-agent": "^2.2.1",
     "isomorphic-fetch": "^2.2.1",
     "koa": "^2.5.2",
-    "koa-router": "^7.4.0"
+    "koa-bodyparser": "^4.2.1",
+    "koa-router": "^7.4.0",
+    "nunjucks": "^3.1.3"
   }
 }

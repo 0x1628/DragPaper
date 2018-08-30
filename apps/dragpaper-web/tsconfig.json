@@ -1,8 +1,18 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "lib": [
+      "es2017",
+      "dom"
+    ],
+    "rootDir": "src",
+    "outDir": "dist",
+    "baseUrl": "./",
+    "strict": true,
     "experimentalDecorators": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "https-proxy-agent": ["typings/index.d.ts"]
+    }
   }
 }

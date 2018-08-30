@@ -1,18 +1,33 @@
 import {IRouterContext} from 'koa-router'
+import * as fs from 'fs'
+import * as path from 'path'
 import http, { HttpOptions } from './http'
 import {readConfigSync, readConfig, writeConfig} from './tools'
+import log from './log'
 
 type string2string = {[key: string]: string}
 const dropboxConfig = readConfigSync().dropbox
+const tokenFile = path.resolve(process.cwd(), dropboxConfig.tokenFile || '.token')
+let token: string = ''
+try {
+  if (fs.statSync(tokenFile).isFile()) {
+    token = fs.readFileSync(tokenFile).toString()
+  }
+} catch (e) {}
+
+export function getToken() {
+  return token
+}
 
 if (!dropboxConfig.email) {
   throw new Error('Must config dropbox email')
   process.exit(1)
 }
 
-function oauth(code: string)
-function oauth(ctx: IRouterContext)
-function oauth(ctx: any) {
+
+function oauth(code: string): Promise<any>
+function oauth(ctx: IRouterContext): Promise<any>
+function oauth(ctx: any): Promise<any> {
   // test url
   // https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=8tbewlgh2d2c289&redirect_uri=http%3A%2F%2Flocalhost%3A7300%2Foauth_callback
   
@@ -27,7 +42,8 @@ function oauth(ctx: any) {
   data.set('client_id', '8tbewlgh2d2c289')
   data.set('client_secret', 'a0bk1f80bgabggx')
   data.set('redirect_uri', 'http://localhost:7300/oauth_callback')
-  
+
+  log(`start oauth with code ${code}`)
   return http('https://api.dropboxapi.com/oauth2/token', {
     method: 'POST',
     body: data,
@@ -35,17 +51,8 @@ function oauth(ctx: any) {
       'content-type': 'application/x-www-form-urlencoded',
     },
   }).then((res) => {
-    dropboxConfig.accessToken = res.body.access_token
-    readConfig().then((data: any) => {
-      data = {
-        ...data,
-        dropbox: {
-          ...data.dropbox,
-          ...dropboxConfig,
-        }
-      }
-      writeConfig(data)
-    })
+    log('oauth success')
+    token = res.body.access_token
     if (typeof ctx !== 'string') {
       ctx.body = 'ok'
       return null
@@ -53,7 +60,6 @@ function oauth(ctx: any) {
       return res
     }
   }).catch((res) => {
-    console.error(res.status, res.body)
     if (typeof ctx !== 'string') {
       ctx.body = 'error'
       return null
@@ -65,29 +71,82 @@ function oauth(ctx: any) {
 
 export {oauth}
 
-function dttp(url: string, options: HttpOptions = {}) {
+function dttp(url: string, options: any = {}) {
+  options = {...options}
   if (!url.startsWith('http')) {
     url = `https://api.dropboxapi.com/2${url.startsWith('/') ? '' : '/'}${url}`
   }
+  options.method = options.method || 'POST'
   options.headers = {...options.headers}
-  options.headers['content-type'] = 'application/json'
-  options.headers['authorization'] = `Bearer ${dropboxConfig.accessToken}`
+  if (options.body) {
+    options.headers['content-type'] = 'application/json'
+  }
+  if (options.arg) {
+    options.headers['dropbox-api-arg'] = typeof options.arg === 'string' ?
+      options.arg : JSON.stringify(options.arg)
+    delete options.arg
+  }
+  options.headers['authorization'] = `Bearer ${token}`
+  console.log(options)
   return http(url, options)
 }
 
 export function oauthAndCheck(ctx: IRouterContext) {
+  log('start oauth and check')
   return oauth(ctx.query.code).then((res: any) => {
     const {access_token: accessToken, account_id: accountId} = res.body
-    return dttp(`/users/get_account`, {
-      method: 'POST',
-      body: {
-        account_id: accountId,
-      },
-    }).then((res) => {
-      const {email} = res.body
+    return check(ctx).then(() => {
+      return new Promise((resolve) => {
+        const tokenFile = path.resolve(process.cwd(), dropboxConfig.tokenFile || '.token')
+        fs.writeFile(tokenFile, accessToken, (err) => {
+          log('token file writed')
+          if (err) {
+            console.log(err)
+          }
+          ctx.redirect('/')
+          resolve()
+        })
+      })
     }).catch((res) => {
       console.log(res)
       ctx.body = 'error'
     })
+  })
+}
+
+export function check(ctx: IRouterContext) {
+  log('start check account')
+  return dttp('/users/get_current_account').then((res): Promise<any> => {
+    log('check account success')
+    const {email} = res.body
+    if (dropboxConfig.email !== email) {
+      ctx.body = 'Dropbox email unmatched.'
+      return Promise.reject()
+    }
+    return Promise.resolve(res)
+  }, (e) => {
+    log(`check account fail: ${e.status}`)
+    if (e.status === 400) {
+      return new Promise((resolve) => {
+        token = ''
+        fs.unlink(tokenFile, (err) => {
+          resolve()
+        })
+      })
+    } else {
+      throw e
+    }
+  })
+}
+
+export function saveMarkDown(str: string) {
+  log('start save markdown')
+  return dttp('/paper/docs/create', {
+    arg: {
+      import_format: 'markdown',
+      parent_folder_id: dropboxConfig.folder,
+    },
+  }).then((res) => {
+    console.log(res)
   })
 }

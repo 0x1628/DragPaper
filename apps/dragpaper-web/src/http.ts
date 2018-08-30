@@ -1,19 +1,25 @@
 import * as fetch from 'isomorphic-fetch'
 import * as FormData from 'form-data'
 import * as HttpsProxyAgent from 'https-proxy-agent'
+import log from './log'
 
 type string2any = {[key: string]: any}
 
 export type HttpOptions = {
   method?: string
-  body?: FormData | string2any | string
-  headers?: HeadersInit
-} | string2any
+  body?: FormData | string2any | string | null
+  headers?: string2any
+  [key: string]: any
+}
 
 type HttpResponse = {
   status: number
   headers: any
   body: any
+}
+
+if (process.env.PROXY) {
+  log(`use proxy ${process.env.PROXY}`)
 }
 
 function http(url: string, options: HttpOptions = {}): Promise<HttpResponse> {
@@ -44,9 +50,9 @@ function http(url: string, options: HttpOptions = {}): Promise<HttpResponse> {
 
       if (typeof body === 'object') {
         finalOptions.body = Object.keys(body).reduce((target, key) => {
-          target.push(`${key}=${body[key]}`)
+          target.push(`${key}=${(<any>body)[key]}`)
           return target
-        }, []).join('&')
+        }, <string[]>[]).join('&')
       } else {
         finalOptions.body = options.body
       }
@@ -54,18 +60,17 @@ function http(url: string, options: HttpOptions = {}): Promise<HttpResponse> {
   }
 
   if (typeof document === 'undefined' && typeof process.env.PROXY !== 'undefined') {
-    console.log(`use proxy ${process.env.PROXY}`)
     finalOptions['agent'] = new HttpsProxyAgent(process.env.PROXY)
   }
 
   return fetch(url, {
     ...finalOptions,
-    body: finalOptions.body,
-  }).then((res) => {
+    body: <any>finalOptions.body,
+  }).then((res: any) => {
     if (res.status < 300) {
       return res.json()
         .catch(() => res.text())
-        .then((body) => {
+        .then((body: any) => {
           return {
             status: res.status,
             headers: res.headers,
@@ -73,7 +78,7 @@ function http(url: string, options: HttpOptions = {}): Promise<HttpResponse> {
           }
         })
     } else {
-      return res.text().then((text) => {
+      return res.text().then((text: string) => {
         return Promise.reject({
           status: res.status,
           headers: res.headers,

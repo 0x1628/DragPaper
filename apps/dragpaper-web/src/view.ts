@@ -1,16 +1,23 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import * as nunjucks from 'nunjucks'
+import {getToken} from './dropbox'
+import {readConfig} from './tools'
 
 const base = path.resolve(process.cwd(), 'view')
+nunjucks.configure(base, {
+  autoescape: true,
+  watch: true,
+})
 
 export async function login() {
-  return new Promise((resolve) => {
-    fs.readFile(path.resolve(base, 'login.html'), (err, data) => {
-      resolve(data.toString())
-    })
-  })
+  return nunjucks.render('login.html')
 }
 
-export function welcome() {
-  return 'welcome'
+export async function welcome() {
+  const targetTemplate = getToken() ? 'welcome.html' : 'link.html'
+  return readConfig().then((config: any) => {
+    return nunjucks.render(targetTemplate, config)
+  })
+  return nunjucks.render(targetTemplate)
 }
