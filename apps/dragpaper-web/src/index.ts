@@ -4,6 +4,7 @@ import * as bodyParser from 'koa-bodyparser'
 import * as dropbox from './dropbox'
 import * as view from './view'
 import * as account from './account'
+import Clip from './Clip'
 import {readConfig} from './tools'
 import {AuthError} from './error'
 
@@ -66,6 +67,11 @@ router
   .get('/save/markdown', async (ctx) => {
     await dropbox.saveMarkDown('# Hello World\n\nhahaha')
     ctx.body = 'done'
+  })
+  .get('/save/webpage', async (ctx) => {
+    new Clip('https://zhuanlan.zhihu.com/p/43415397').fetchPage().then((content) => {
+      dropbox.saveHTML(content)
+    })
   })
 
 app

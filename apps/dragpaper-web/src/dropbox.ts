@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import http, { HttpOptions } from './http'
 import {readConfigSync, readConfig, writeConfig} from './tools'
+import TempFile from './TempFile'
 import log from './log'
 
 type string2string = {[key: string]: string}
@@ -78,7 +79,7 @@ function dttp(url: string, options: any = {}) {
   }
   options.method = options.method || 'POST'
   options.headers = {...options.headers}
-  if (options.body) {
+  if (options.body && !options.headers['content-type']) {
     options.headers['content-type'] = 'application/json'
   }
   if (options.arg) {
@@ -87,7 +88,6 @@ function dttp(url: string, options: any = {}) {
     delete options.arg
   }
   options.headers['authorization'] = `Bearer ${token}`
-  console.log(options)
   return http(url, options)
 }
 
@@ -146,7 +146,34 @@ export function saveMarkDown(str: string) {
       import_format: 'markdown',
       parent_folder_id: dropboxConfig.folder,
     },
+    headers: {
+      'content-type': 'application/octet-stream',
+    },
+    body: fs.createReadStream(path.resolve(process.cwd(), 'temp.md')),
   }).then((res) => {
     console.log(res)
+  })
+}
+
+export function saveHTML(str: string) {
+  log('start save html')
+  const file = new TempFile(str)
+  return file.save().then(() => {
+    return dttp('/paper/docs/create', {
+      arg: {
+        import_format: 'html',
+        parent_folder_id: dropboxConfig.folder,
+      },
+      headers: {
+        'content-type': 'application/octet-stream',
+      },
+      body: fs.createReadStream(file.getFilePath()),
+    })
+  }).then(() => {
+    console.log(233)
+    file.destroy()
+  }).catch((e) => {
+    file.destroy()
+    console.log(e)
   })
 }

@@ -41,18 +41,23 @@ function http(url: string, options: HttpOptions = {}): Promise<HttpResponse> {
       if (!finalOptions.headers['content-type']) {
         finalOptions.headers['content-type'] = 'application/x-www-form-urlencoded'
       }
-      if (body instanceof Map || body instanceof Set) {
-        body = Array.from(body).reduce((target, [key, value]) => {
-          target[key] = value
-          return target
-        }, {})
-      }
 
-      if (typeof body === 'object') {
-        finalOptions.body = Object.keys(body).reduce((target, key) => {
-          target.push(`${key}=${(<any>body)[key]}`)
-          return target
-        }, <string[]>[]).join('&')
+      if (finalOptions.headers['content-type'] === 'application/x-www-form-urlencoded') {
+        if (body instanceof Map || body instanceof Set) {
+          body = Array.from(body).reduce((target, [key, value]) => {
+            target[key] = value
+            return target
+          }, {})
+        }
+  
+        if (typeof body === 'object') {
+          finalOptions.body = Object.keys(body).reduce((target, key) => {
+            target.push(`${key}=${(<any>body)[key]}`)
+            return target
+          }, <string[]>[]).join('&')
+        } else {
+          finalOptions.body = options.body
+        }
       } else {
         finalOptions.body = options.body
       }
@@ -68,8 +73,9 @@ function http(url: string, options: HttpOptions = {}): Promise<HttpResponse> {
     body: <any>finalOptions.body,
   }).then((res: any) => {
     if (res.status < 300) {
-      return res.json()
-        .catch(() => res.text())
+      const method = (res.headers['content-type'] || '').indexOf('json') !== -1 ?
+        'json' : 'text'
+      return res[method]()
         .then((body: any) => {
           return {
             status: res.status,

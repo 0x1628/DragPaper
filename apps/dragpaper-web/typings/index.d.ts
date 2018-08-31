@@ -20,3 +20,9 @@ declare module 'https-proxy-agent' {
 
   export = HttpsProxyAgent
 }
+
+declare module 'node-readability' {
+  namespace Read {}
+  function Read(url: string, ...rest: any[]): any
+  export = Read
+}
