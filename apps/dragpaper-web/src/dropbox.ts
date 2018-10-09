@@ -117,11 +117,11 @@ export function oauthAndCheck(ctx: IRouterContext) {
 export function check(ctx: IRouterContext) {
   log('start check account')
   return dttp('/users/get_current_account').then((res): Promise<any> => {
-    log('check account success')
+    log('check account result')
     const {email} = res.body
     if (dropboxConfig.email !== email) {
       ctx.body = 'Dropbox email unmatched.'
-      return Promise.reject()
+      return Promise.reject({})
     }
     return Promise.resolve(res)
   }, (e) => {
@@ -151,7 +151,7 @@ export function saveMarkDown(str: string) {
     },
     body: fs.createReadStream(path.resolve(process.cwd(), 'temp.md')),
   }).then((res) => {
-    console.log(res)
+    log(`markdown saved`)
   })
 }
 
@@ -169,8 +169,8 @@ export function saveHTML(str: string) {
       },
       body: fs.createReadStream(file.getFilePath()),
     })
-  }).then(() => {
-    console.log(233)
+  }).then((res) => {
+    log(`html saved with response ${JSON.stringify(res.body)}`)
     file.destroy()
   }).catch((e) => {
     file.destroy()

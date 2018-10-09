@@ -13,11 +13,28 @@ class Clip {
     }).then((res): Promise<string> => {
       return new Promise((resolve) => {
         read(res.body, (err: any, article: any, meta: any) => {
-          this.content = article.content
+          this.content = this.clean(article.title, article.content, this.url)
           resolve(this.content)
         })
       })
     })
+  }
+
+  clean(title: string, html: string, url: string): string {
+    html = `<h1>${title}</h1>${html}`
+    html = html.replace(/(<\w+).*?(\ (src|href)=".+?")?.*?(\/?>)/g, '$1$2$4')
+
+    const cleanerType = url.replace(/https?:\/\/(.+?\.)?(.+?)\.\w+\/?.*/, '$2')
+    if (cleanerType) {
+      try {
+        let cleaner = require(`./cleaners/${cleanerType}`)
+        if (cleaner.default) {
+          cleaner = cleaner.default
+        }
+        html = cleaner(html, url)
+      } catch(e) {}
+    }
+    return html
   }
 
   getContent() {

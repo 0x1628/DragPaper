@@ -73,7 +73,7 @@ function http(url: string, options: HttpOptions = {}): Promise<HttpResponse> {
     body: <any>finalOptions.body,
   }).then((res: any) => {
     if (res.status < 300) {
-      const method = (res.headers['content-type'] || '').indexOf('json') !== -1 ?
+      const method = (res.headers.get('content-type') || '').indexOf('json') !== -1 ?
         'json' : 'text'
       return res[method]()
         .then((body: any) => {
