@@ -172,6 +172,7 @@ export function saveHTML(str: string) {
   }).then((res) => {
     log(`html saved with response ${JSON.stringify(res.body)}`)
     file.destroy()
+    return res.body
   }).catch((e) => {
     file.destroy()
     console.log(e)

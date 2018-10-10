@@ -69,9 +69,19 @@ router
     ctx.body = 'done'
   })
   .get('/save/webpage', async (ctx) => {
-    new Clip('https://zhuanlan.zhihu.com/p/43415397').fetchPage().then((content) => {
-      dropbox.saveHTML(content)
-    })
+    if (!ctx.query.t || !/^https?:\/\/.+/.test(ctx.query.t)) {
+      ctx.status = 404
+      return
+    }
+    try {
+      const content = await new Clip(ctx.query.t).fetchPage()
+      const result = await dropbox.saveHTML(content)
+      ctx.set('content-type', 'application/json')
+      ctx.body = result
+    } catch (e) {
+      console.log(e)
+      ctx.status = 500
+    }
   })
 
 app

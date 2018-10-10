@@ -68,30 +68,40 @@ function http(url: string, options: HttpOptions = {}): Promise<HttpResponse> {
     finalOptions['agent'] = new HttpsProxyAgent(process.env.PROXY)
   }
 
-  return fetch(url, {
-    ...finalOptions,
-    body: <any>finalOptions.body,
-  }).then((res: any) => {
-    if (res.status < 300) {
-      const method = (res.headers.get('content-type') || '').indexOf('json') !== -1 ?
-        'json' : 'text'
-      return res[method]()
-        .then((body: any) => {
-          return {
+  return new Promise((resolve, reject) => {
+    const tm = setTimeout(() => {
+      reject(new Error(`fetch ${url} timeout`))
+    }, 10 * 1000)
+
+    fetch(url, {
+      ...finalOptions,
+      body: <any>finalOptions.body,
+    }).then((res: any) => {
+      clearTimeout(tm)
+      if (res.status < 300) {
+        const method = (res.headers.get('content-type') || '').indexOf('json') !== -1 ?
+          'json' : 'text'
+        res[method]()
+          .then((body: any) => {
+            resolve({
+              status: res.status,
+              headers: res.headers,
+              body,
+            })
+          })
+      } else {
+        res.text().then((text: string) => {
+          reject({
             status: res.status,
             headers: res.headers,
-            body,
-          }
+            body: text,
+          })
         })
-    } else {
-      return res.text().then((text: string) => {
-        return Promise.reject({
-          status: res.status,
-          headers: res.headers,
-          body: text,
-        })
-      })
-    }
+      }
+    }).catch(e => {
+      clearTimeout(tm)
+      reject(e)
+    })
   })
 }
 
