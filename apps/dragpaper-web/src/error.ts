@@ -7,6 +7,8 @@ export class NotFoundError extends Error implements RequestError {
 
   constructor() {
     super()
+    Object.setPrototypeOf(this, NotFoundError.prototype)
+
     this.name = 'NotFoundError'
     this.message = 'url not found'
   }
@@ -17,8 +19,9 @@ export class AuthError extends Error implements RequestError {
 
   constructor() {
     super()
+    Object.setPrototypeOf(this, AuthError.prototype)
 
     this.name = 'AuthError'
-    this.message = 'nor login or token error'
+    this.message = 'not login or token error'
   }
 }
