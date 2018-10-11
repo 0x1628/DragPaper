@@ -62,7 +62,7 @@ router
   })
   .get('/', async (ctx) => {
     await dropbox.check(ctx)
-    ctx.body = await view.welcome()
+    ctx.body = await view.welcome(ctx.request.host)
   })
   .get('/save/markdown', async (ctx) => {
     await dropbox.saveMarkDown('# Hello World\n\nhahaha')

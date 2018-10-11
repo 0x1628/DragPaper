@@ -53,6 +53,9 @@ function oauth(ctx: any): Promise<any> {
     },
   }).then((res) => {
     log('oauth success')
+    if (typeof res.body === 'string') { // dropbox oauth response type may be text/javascript
+      res.body = JSON.parse(res.body)
+    }
     token = res.body.access_token
     if (typeof ctx !== 'string') {
       ctx.body = 'ok'
@@ -92,9 +95,10 @@ function dttp(url: string, options: any = {}) {
 }
 
 export function oauthAndCheck(ctx: IRouterContext) {
-  log('start oauth and check')
+  log(`start oauth and check width code ${ctx.query.code}`)
   return oauth(ctx.query.code).then((res: any) => {
     const {access_token: accessToken, account_id: accountId} = res.body
+    log(`auth success with account ${accountId}`)
     return check(ctx).then(() => {
       return new Promise((resolve) => {
         const tokenFile = path.resolve(process.cwd(), dropboxConfig.tokenFile || '.token')

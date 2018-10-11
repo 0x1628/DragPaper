@@ -14,10 +14,12 @@ export async function login() {
   return nunjucks.render('login.html')
 }
 
-export async function welcome() {
+export async function welcome(host: string) {
   const targetTemplate = getToken() ? 'welcome.html' : 'link.html'
   return readConfig().then((config: any) => {
-    return nunjucks.render(targetTemplate, config)
+    return nunjucks.render(targetTemplate, {
+      ...config,
+      host,
+    })
   })
-  return nunjucks.render(targetTemplate)
 }
