@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as nunjucks from 'nunjucks'
+import {Request} from 'koa'
 import {getToken} from './dropbox'
 import {readConfig} from './tools'
 
@@ -14,12 +15,13 @@ export async function login() {
   return nunjucks.render('login.html')
 }
 
-export async function welcome(host: string) {
+export async function welcome(req: Request) {
   const targetTemplate = getToken() ? 'welcome.html' : 'link.html'
   return readConfig().then((config: any) => {
     return nunjucks.render(targetTemplate, {
       ...config,
-      host,
+      host: req.host,
+      protocol: req.protocol,
     })
   })
 }

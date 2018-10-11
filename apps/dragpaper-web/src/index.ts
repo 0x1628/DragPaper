@@ -11,6 +11,7 @@ import {AuthError} from './error'
 const app = new Koa()
 const router = new Router()
 
+app.proxy = true
 app.use(bodyParser())
 
 app.use(async (ctx, next) => {
@@ -62,7 +63,7 @@ router
   })
   .get('/', async (ctx) => {
     await dropbox.check(ctx)
-    ctx.body = await view.welcome(ctx.request.host)
+    ctx.body = await view.welcome(ctx.request)
   })
   .get('/save/markdown', async (ctx) => {
     await dropbox.saveMarkDown('# Hello World\n\nhahaha')
