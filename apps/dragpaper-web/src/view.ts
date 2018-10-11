@@ -18,10 +18,15 @@ export async function login() {
 export async function welcome(req: Request) {
   const targetTemplate = getToken() ? 'welcome.html' : 'link.html'
   return readConfig().then((config: any) => {
+    let root = req.header['x-forwarded-path'] || req.path
+    if (!root.endsWith('/')) {
+      root = `${root}/`
+    }
     return nunjucks.render(targetTemplate, {
       ...config,
       host: req.host,
       protocol: req.protocol,
+      root,
     })
   })
 }
