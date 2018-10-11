@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as crypto from 'crypto'
+import {Request} from 'koa'
 
 const configFile = path.resolve(process.cwd(), 'config.json')
 let config:any = null
@@ -36,4 +37,19 @@ export function md5(str: string) {
   const hash = crypto.createHash('md5')
   hash.update(str)
   return hash.digest('hex')
+}
+
+export function getRequestInfo(req: Request) {
+  let root: string = req.header['x-forwarded-root'] || '/'
+  if (!root.endsWith('/')) {
+    root = `${root}/`
+  }
+
+  return {
+    host: req.host,
+    root,
+    path: req.path.slice(1),
+    hostname: req.hostname,
+    protocol: req.protocol,
+  }
 }

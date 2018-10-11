@@ -2,7 +2,7 @@ import {IRouterContext} from 'koa-router'
 import * as fs from 'fs'
 import * as path from 'path'
 import http, { HttpOptions } from './http'
-import {readConfigSync, readConfig, writeConfig} from './tools'
+import {readConfigSync, readConfig, writeConfig, getRequestInfo} from './tools'
 import TempFile from './TempFile'
 import log from './log'
 
@@ -26,23 +26,20 @@ if (!dropboxConfig.email) {
 }
 
 
-function oauth(code: string): Promise<any>
-function oauth(ctx: IRouterContext): Promise<any>
-function oauth(ctx: any): Promise<any> {
+function oauth(ctx: IRouterContext): Promise<any> {
   // test url
   // https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=8tbewlgh2d2c289&redirect_uri=http%3A%2F%2Flocalhost%3A7300%2Foauth_callback
   
-  let code = ctx
-  if (typeof code !== 'string') {
-    code = ctx.query.code
-  }
+  const code = ctx.query.code
 
   const data = new Map
   data.set('code', code)
   data.set('grant_type', 'authorization_code')
   data.set('client_id', '8tbewlgh2d2c289')
   data.set('client_secret', 'a0bk1f80bgabggx')
-  data.set('redirect_uri', 'http://localhost:7300/oauth_callback')
+  
+  const {root, host, protocol} = getRequestInfo(ctx.request)
+  data.set('redirect_uri', `${protocol}://${host}${root}oauth_callback`)
 
   log(`start oauth with code ${code}`)
   return http('https://api.dropboxapi.com/oauth2/token', {
@@ -57,19 +54,9 @@ function oauth(ctx: any): Promise<any> {
       res.body = JSON.parse(res.body)
     }
     token = res.body.access_token
-    if (typeof ctx !== 'string') {
-      ctx.body = 'ok'
-      return null
-    } else {
-      return res
-    }
+    return res
   }).catch((res) => {
-    if (typeof ctx !== 'string') {
-      ctx.body = 'error'
-      return null
-    } else {
-      throw res
-    }
+    throw res
   })
 }
 
@@ -96,7 +83,7 @@ function dttp(url: string, options: any = {}) {
 
 export function oauthAndCheck(ctx: IRouterContext) {
   log(`start oauth and check width code ${ctx.query.code}`)
-  return oauth(ctx.query.code).then((res: any) => {
+  return oauth(ctx).then((res: any) => {
     const {access_token: accessToken, account_id: accountId} = res.body
     log(`auth success with account ${accountId}`)
     return check(ctx).then(() => {
@@ -107,7 +94,8 @@ export function oauthAndCheck(ctx: IRouterContext) {
           if (err) {
             console.log(err)
           }
-          ctx.redirect('/')
+          const {root} = getRequestInfo(ctx.request)
+          ctx.redirect(root)
           resolve()
         })
       })

@@ -3,7 +3,7 @@ import * as path from 'path'
 import * as nunjucks from 'nunjucks'
 import {Request} from 'koa'
 import {getToken} from './dropbox'
-import {readConfig} from './tools'
+import {readConfig, getRequestInfo} from './tools'
 
 const base = path.resolve(process.cwd(), 'view')
 nunjucks.configure(base, {
@@ -18,14 +18,11 @@ export async function login() {
 export async function welcome(req: Request) {
   const targetTemplate = getToken() ? 'welcome.html' : 'link.html'
   return readConfig().then((config: any) => {
-    let root = req.header['x-forwarded-path'] || req.path
-    if (!root.endsWith('/')) {
-      root = `${root}/`
-    }
+    const {root, host, protocol} = getRequestInfo(req)
     return nunjucks.render(targetTemplate, {
       ...config,
-      host: req.host,
-      protocol: req.protocol,
+      host,
+      protocol,
       root,
     })
   })
