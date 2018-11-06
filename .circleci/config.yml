@@ -1,0 +1,32 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10.12
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "yarn.lock" }}
+          - v1-dependencies-
+
+      - run: yarn install
+
+      - run: NODE_ENV=production npm run build
+
+      - run:
+          name: Deploy
+          command: scp -o "StrictHostKeyChecking no" -r ./apps/dragpaper-web/* ci@xxxiin.com:/home/web/dragpaper-web
+      
+      - run:
+          name: Deploy2
+          command: ssh -o "StrictHostKeyChecking no" ci@xxxiin.com 'cd /home/web/dragpaper-web && yarn && pm2 restart dragpaper'
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "yarn.lock" }}

@@ -1,5 +1,32 @@
-<form action="/login" method="POST">
-  <input type="text" name="username" />
-  <input type="password" name="password" />
+<form action="./login" method="POST" id="loginForm">
+  <input type="text" name="username" autocomplete="username" />
+  <input type="password" name="password" autocomplete="current-password" />
   <button type="submit">Submit</button>
 </form>
+
+<script>
+  (function() {
+    const form = document.getElementById('loginForm')
+    form.addEventListener('submit', (e) => {
+      e.preventDefault()
+      fetch(form.getAttribute('action'), {
+        method: 'POST',
+        body: JSON.stringify({
+          username: form.username.value,
+          password: form.password.value
+        }),
+        headers: {
+          'content-type': 'application/json'
+        },
+      }).then(res => res.json()).then(json => {
+        if (json.code) {
+          alert(json.err)
+        } else {
+        location.reload()
+        }
+      }).catch(() => {
+        alert('unknow error')
+      })
+    })
+  })()
+</script>

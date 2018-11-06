@@ -5,6 +5,10 @@
   "workspaces": [
     "apps/*"
   ],
+  "scripts": {
+    "build": "NODE_ENV=production npm run build-web",
+    "build-web": "tsc -p apps/dragpaper-web/"
+  },
   "author": "hi@fragment0.com",
   "license": "MIT"
 }
