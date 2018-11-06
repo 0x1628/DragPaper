@@ -24,7 +24,7 @@ jobs:
       
       - run:
           name: Deploy2
-          command: ssh -o "StrictHostKeyChecking no" ci@xxxiin.com 'cd /home/web/dragpaper-web && yarn && pm2 restart dragpaper'
+          command: ssh -o "StrictHostKeyChecking no" ci@xxxiin.com 'cd /home/web/dragpaper-web && yarn && env HOME=/home/pm2 pm2 restart dragpaper-web'
 
       - save_cache:
           paths:
