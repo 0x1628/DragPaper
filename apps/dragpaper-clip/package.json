@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "author": "hi@fragment0.com",
+  "scripts": {
+    "dev": "../../node_modules/.bin/tsc -p . -w"
+  },
   "license": "MIT"
 }
