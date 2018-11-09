@@ -1,3 +1,3 @@
-/// <css path="./options.css" />
+/// <css-inject path="./options.css" />
 
-document.body.innerHTML = 'hello world'
+document.body.innerHTML = 'hello world2'

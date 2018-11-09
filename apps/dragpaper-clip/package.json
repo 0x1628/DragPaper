@@ -4,7 +4,10 @@
   "main": "index.js",
   "author": "hi@fragment0.com",
   "scripts": {
-    "dev": "../../node_modules/.bin/tsc -p . -w"
+    "dev": "tscci -w"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "tsc-css-inject": "0.0.1"
+  }
 }
