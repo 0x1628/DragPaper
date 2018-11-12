@@ -1,6 +1,7 @@
 import * as Koa from 'koa'
 import * as Router from 'koa-router'
 import * as bodyParser from 'koa-bodyparser'
+import {URL} from 'url'
 import * as dropbox from './dropbox'
 import * as view from './view'
 import * as account from './account'
@@ -16,20 +17,22 @@ app.use(bodyParser())
 
 app.use(async (ctx, next) => {
   try {
+    if (ctx.request.headers['referer']) {
+      const referer = new URL(ctx.request.headers['referer'])
+      ctx.set('access-control-allow-credentials', 'true')
+      ctx.set('access-control-allow-origin', `${referer.protocol}//${referer.host}`)
+    }
     await next()
   } catch (error) {
     if (!error.status) {
       throw error
     }
     if (error instanceof AuthError) {
-      if (ctx.request.method.toLocaleLowerCase() !== 'get') {
-        ctx.status = 404
-        return
-      }
       if (ctx.path === '/') {
         ctx.body = await view.login()
       } else {
-        ctx.redirect('/')
+        ctx.status = 403
+        return
       }
     } else {
       console.log(error)
