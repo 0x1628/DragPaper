@@ -3,5 +3,17 @@
   "version": "1.0",
   "description": "Save webpage to your dropbox",
   "options_page": "options.html",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "https://engine.fragment0.com/"
+  ],
+  "background": {
+    "scripts": ["dist/background.js"],
+    "persistent": false
+  },
+  "browser_action": {
+  },
   "manifest_version": 2
 }

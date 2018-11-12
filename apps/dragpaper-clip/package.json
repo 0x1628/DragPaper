@@ -8,6 +8,6 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "tsc-css-inject": "0.0.1"
+    "tsc-css-inject": "^0.0.2"
   }
 }
