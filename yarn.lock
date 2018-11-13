@@ -3096,10 +3096,10 @@ ts-node@^7.0.1:
     source-map-support "^0.5.6"
     yn "^2.0.0"
 
-tsc-css-inject@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/tsc-css-inject/-/tsc-css-inject-0.0.2.tgz#b4f3689c1e029eb0ef5d2707acfa464f865febbd"
-  integrity sha512-66GywqTvZG2w21YSt5Dw5wlm8SvqMG4tlXnvLVjh7dD+/wys3PhcCv8A3Wj45iYGe6/PD0g8u7kTSRQe8ldFPA==
+tsc-css-inject@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/tsc-css-inject/-/tsc-css-inject-0.0.3.tgz#02ecdb27d67341fdb6fdc2d972de3ce0f2540112"
+  integrity sha512-8/fYnDEMM2IkU8zjDkEDJSeZScbbnR2/Gtj0/o1/VEJgDVe6fUT/2U1wvAAMGUQB4t5EukpRU7u+RDfh1wnI+Q==
   dependencies:
     less "^3.8.1"
     lodash.debounce "^4.0.8"

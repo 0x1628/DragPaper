@@ -4,10 +4,11 @@
   "main": "index.js",
   "author": "hi@fragment0.com",
   "scripts": {
-    "dev": "tscci -w"
+    "dev": "tscci -w",
+    "build": "NODE_ENV=production tscci"
   },
   "license": "MIT",
   "devDependencies": {
-    "tsc-css-inject": "^0.0.2"
+    "tsc-css-inject": "^0.0.3"
   }
 }
