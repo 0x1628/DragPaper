@@ -1,1 +1,22 @@
-<a href="https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=8tbewlgh2d2c289&redirect_uri={{protocol}}%3A%2F%2F{{host | urlencode}}{{root | urlencode}}oauth_callback">link</a>
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+a {
+  display: block;
+  width: 260px;
+  line-height: 30px;
+  background: #ffcb01;
+  color: #ee311f;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+}
+</style>
+
+<body>
+  <a href="https://www.dropbox.com/oauth2/authorize?response_type=code&client_id=8tbewlgh2d2c289&redirect_uri={{protocol}}%3A%2F%2F{{host | urlencode}}{{root | urlencode}}oauth_callback">
+    link dropbox
+  </a>  
+</body>
+{% endblock %}

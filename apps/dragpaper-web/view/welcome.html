@@ -2,9 +2,72 @@
 
 {% block content %}
 
-Hi {{account.username}}
+<style>
+body {
+  font-size: 18px;
+}
 
-{{dropbox.email}}
-{{dropbox.folder}}
+.welcome {
+  width: 260px;
+  text-align: center;
+}
+
+.title {
+  font-size: 14px;
+  color: #444;
+  text-transform: uppercase;
+}
+
+.username,
+.item {
+  width: 200px;
+  padding: 0 20px;
+  margin: 10px auto 0;
+  line-height: 30px;
+  background: #ffcb01;
+  color: #ee311f;
+  border-radius: 6px;
+  position: relative;
+}
+
+.username {
+  margin-bottom: 30px;
+}
+
+.item {
+  margin-top: 20px;
+  padding: 8px 20px;
+}
+
+.item .label {
+  position: absolute;
+  line-height: 1;
+  top: -12px;
+  left: 0;
+  font-size: 12px;
+  color: #333;
+  text-transform: uppercase;
+}
+
+.item .value {
+  font-size: 14px;
+  word-wrap:break-word;
+  line-height: 1.2;
+}
+</style>
+
+<div class="welcome">
+  <div class="title">Hi</div>
+  <div class="username">{{account.username}}</div>
+  <div class="title">dropbox config</div>
+  <div class="item">
+    <div class="label">email</div>
+    <div class="value">{{dropbox.email}}</div>
+  </div>
+  <div class="item">
+    <div class="label">folder</div>
+    <div class="value">{{dropbox.folder}}</div>
+  </div>
+</div>
 
 {% endblock %}
