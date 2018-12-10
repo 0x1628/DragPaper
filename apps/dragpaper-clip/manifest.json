@@ -13,6 +13,11 @@
     "scripts": ["dist/background.js"],
     "persistent": false
   },
+  "icons": {
+    "16": "assets/16.png",
+    "48": "assets/48.png",
+    "128": "assets/128.png"
+  },
   "browser_action": {
   },
   "manifest_version": 2

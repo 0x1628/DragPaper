@@ -5,7 +5,8 @@
   "author": "hi@fragment0.com",
   "scripts": {
     "dev": "tscci -w",
-    "build": "NODE_ENV=production tscci"
+    "build": "NODE_ENV=production tscci",
+    "zip": "npm run build && zip 'dragpaper-clip.zip' -r manifest.json *.html dist assets"
   },
   "license": "MIT",
   "devDependencies": {

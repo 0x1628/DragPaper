@@ -4,6 +4,20 @@ import http from './http'
 import log from './log'
 import {addLineForBlock} from './beautifiers'
 
+export interface ReadResult {
+  content: string
+  title: string
+}
+
+const asyncReadability = async (html: string): Promise<ReadResult> => {
+  return new Promise<ReadResult>((resolve, reject) => {
+    read(html, (err: any, article: any) => {
+      if (err) {reject(err)}
+      resolve({content: article.content, title: article.title})
+    })
+  })
+}
+
 class Clip {
   content = ''
   constructor(protected url: string) {}
@@ -20,35 +34,29 @@ class Clip {
       headers: {
         'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
       },
-    }).then((res): Promise<string> => {
+    }).then(async (res): Promise<string> => {
       log(`url ${this.url} fetched`)
-      return new Promise((resolve) => {
-        let content = res.body
-        const preprocessType = this.getHost(this.url)
-        if (preprocessType) {
-          try {
-            let preproccessor = require(`./preprocessors/${preprocessType}`)
-            if (preproccessor.default) {
-              preproccessor = preproccessor.default
-            }
-            content = preproccessor(content, this.url)
-          } catch (e) {}
-        }
+      let html = res.body
+      const preprocessType = this.getHost(this.url)
 
-        read(content, (err: any, article: any, meta: any) => {
-          if (err) {
-            throw err
-          }
-          this.content = article.content
-          this.processors.forEach(pName => {
-            const processor = (<any>this)[pName]
-            if (processor) {
-              this.content = processor.call(this, this.content, article.title)
-            }
-          })
-          resolve(this.content)
-        })
+      let customProcessor = null
+      try {
+        customProcessor = require(`./custom-processors/${preprocessType}`)
+      } catch (e) { console.error(e) }
+      if (customProcessor && customProcessor.replacer) {
+        html = customProcessor.replacer(html, this.url)
+      }
+      const readMethod: typeof asyncReadability = (customProcessor && customProcessor.read) || asyncReadability
+      let {content, title} = await readMethod(html)
+      this.processors.forEach(pName => {
+        const processor = (<any>this)[pName]
+        if (processor) {
+          content = processor.call(this, content, title)
+        }
       })
+
+      this.content = content
+      return this.content
     })
   }
 
