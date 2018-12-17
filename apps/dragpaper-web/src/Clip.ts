@@ -9,7 +9,7 @@ export interface ReadResult {
   title: string
 }
 
-const asyncReadability = async (html: string): Promise<ReadResult> => {
+export const asyncReadability = async (html: string, url?: string): Promise<ReadResult> => {
   return new Promise<ReadResult>((resolve, reject) => {
     read(html, (err: any, article: any) => {
       if (err) {reject(err)}
@@ -47,7 +47,7 @@ class Clip {
         html = customProcessor.replacer(html, this.url)
       }
       const readMethod: typeof asyncReadability = (customProcessor && customProcessor.read) || asyncReadability
-      let {content, title} = await readMethod(html)
+      let {content, title} = await readMethod(html, this.url)
       this.processors.forEach(pName => {
         const processor = (<any>this)[pName]
         if (processor) {
