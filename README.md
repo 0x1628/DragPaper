@@ -62,7 +62,7 @@ Some variable explanation:
 - account.username: When use dragpaper-web, the server need you do a login, set your login username here.
 - account.password: Set your login password here. Need MD5 encrypted.
 - dropbox.email: Your dropbox account email address.
-- dropbox.folder: The folder id where you want save the clip result. You can get it easily from url like `https://paper.dropbox.com/folder/show/${FOLDER_NAME}-${FOLDER_ID}` 
+- dropbox.folder: The folder id where you want save the clip result. You can get it easily from URL like `https://paper.dropbox.com/folder/show/${FOLDER_NAME}-${FOLDER_ID}` 
 
 #### Start server
 
@@ -81,4 +81,4 @@ I use a shortcut for my clip in iOS. No need another App😁.
 
 ### Android Clipping
 
-No need current now...
+[Share Target](https://developers.google.com/web/updates/2018/12/web-share-target) had finally arrived in Chrome 71! Try browse to your hosted DragPaper URL and install the PWA of DragPaper. Then share to DragPaper is exact the same way as other native Apps! 🎉
