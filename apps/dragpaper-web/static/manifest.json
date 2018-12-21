@@ -1,0 +1,28 @@
+{
+  "name": "DragPaper",
+  "short_name": "DragPaper",
+  "icons": [
+    {
+      "src": "./imgs/192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "./imgs/512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./",
+  "share_target": {
+    "action": "./share",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "theme_color": "#f7f7e0"
+}

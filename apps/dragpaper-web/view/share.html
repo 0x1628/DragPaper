@@ -1,0 +1,59 @@
+{% set pwa = true %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+body {
+  font-size: 18px;
+}
+
+.result {
+  width: 200px;
+  padding: 30px 50px;
+  text-align: center;
+  margin: 10px auto 0;
+  line-height: 30px;
+  color: #f7f7e0;
+  border-radius: 6px;
+  position: relative;
+  display: none;
+}
+
+.result-success {
+  background: #b6ae24;
+}
+
+.result-failure {
+  background: #ee311f;
+}
+
+.result .url {
+  font-size: 13px;
+  max-width: calc(100vw - 100px - 40px);
+  word-break: break-all;
+  line-height: 1.1;
+}
+
+.result .label {
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+</style>
+
+<div class="loading">
+  Saving...
+</div>
+
+<div class="result result-success">
+  <div class="url"></div>
+  <div class="label">Saved!</div>
+</div>
+
+<div class="result result-failure">
+  <div class="url"></div>
+  <div class="label">Error!</div>
+</div>
+
+{% endblock %}

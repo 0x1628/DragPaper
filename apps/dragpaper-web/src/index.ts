@@ -1,12 +1,15 @@
 import * as Koa from 'koa'
 import * as Router from 'koa-router'
 import * as bodyParser from 'koa-bodyparser'
+import * as serve from 'koa-static'
+import * as path from 'path'
 import {URL} from 'url'
+import {Duplex} from 'stream'
 import * as dropbox from './dropbox'
 import * as view from './view'
 import * as account from './account'
 import Clip from './Clip'
-import {readConfig} from './tools'
+import {readConfig, queryToJSON} from './tools'
 import {AuthError} from './error'
 
 const app = new Koa()
@@ -14,6 +17,7 @@ const router = new Router()
 
 app.proxy = true
 app.use(bodyParser())
+app.use(serve(path.resolve(__dirname, '..', 'static')))
 
 app.use(async (ctx, next) => {
   try {
@@ -85,6 +89,46 @@ router
     } catch (e) {
       console.log(e)
       ctx.status = 500
+    }
+  })
+  .get('/share', async (ctx) => {
+    const stream = new Duplex()
+    ctx.status = 200
+    ctx.res.setHeader('Content-Type', 'text/html; charset=utf-8')
+    ctx.res.setHeader('Connection', 'Transfer-Encoding')
+    ctx.res.setHeader('Transfer-Encoding', 'chunked')
+    ctx.res.write(await view.share())
+    const searchObj = queryToJSON(ctx.request.url)
+    let targetUrl = ''
+    Object.values(searchObj).some(value => {
+      if (/^https?:\/\//.test(value)) {
+        targetUrl = value
+        return true
+      }
+      const result = value.match(/(https?:\/\/\S+)( |$)/)
+      if (result) {
+        targetUrl = result[1]
+        return true
+      }
+      return false
+    })
+
+    function end(url: string, success: boolean) {
+      ctx.res.write(`<script>var saveResult = {url: '${url}', success: ${success}}</script>`)
+      ctx.res.write('<script src="./share.js"></script>')
+      ctx.res.end()
+    }
+
+    if (!targetUrl) {
+      end(targetUrl, false)
+      return
+    }
+    try {
+      const content = await new Clip(targetUrl).fetchPage()
+      await dropbox.saveHTML(content)
+      end(targetUrl, true)
+    } catch (e) {
+      end(targetUrl, false)
     }
   })
 

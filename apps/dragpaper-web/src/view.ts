@@ -15,6 +15,10 @@ export async function login() {
   return nunjucks.render('login.html')
 }
 
+export async function share() {
+  return nunjucks.render('share.html')
+}
+
 export async function welcome(req: Request) {
   const targetTemplate = getToken() ? 'welcome.html' : 'link.html'
   return readConfig().then((config: any) => {

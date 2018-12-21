@@ -53,3 +53,13 @@ export function getRequestInfo(req: Request) {
     protocol: req.protocol,
   }
 }
+
+export function queryToJSON(url: string) {
+  const urlObj = new URL(url, 'http://whatever')
+  const {searchParams} = urlObj
+  const result: {[k: string]: string} = {}
+  searchParams.forEach((v, k) => {
+    result[k] = decodeURIComponent(v)
+  })
+  return result
+}
