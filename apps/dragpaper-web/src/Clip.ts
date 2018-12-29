@@ -1,5 +1,6 @@
 import * as read from 'node-readability'
 import * as sanitize from 'sanitize-html'
+import {juice} from 'html-juicer'
 import http from './http'
 import log from './log'
 import {addLineForBlock} from './beautifiers'
@@ -11,9 +12,12 @@ export interface ReadResult {
 
 export const asyncReadability = async (html: string, url?: string): Promise<ReadResult> => {
   return new Promise<ReadResult>((resolve, reject) => {
-    read(html, (err: any, article: any) => {
-      if (err) {reject(err)}
-      resolve({content: article.content, title: article.title})
+    const result = juice(html, {
+      href: url || '',
+    })
+    resolve({
+      content: result.content,
+      title: result.title,
     })
   })
 }
@@ -42,7 +46,7 @@ class Clip {
       let customProcessor = null
       try {
         customProcessor = require(`./custom-processors/${preprocessType}`)
-      } catch (e) { console.error(e) }
+      } catch (e) { }
       if (customProcessor && customProcessor.replacer) {
         html = customProcessor.replacer(html, this.url)
       }

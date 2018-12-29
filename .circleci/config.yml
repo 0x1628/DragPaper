@@ -20,11 +20,11 @@ jobs:
 
       - run:
           name: Deploy
-          command: scp -o "StrictHostKeyChecking no" -r ./apps/dragpaper-web/* ci@xxxiin.com:/home/web/dragpaper-web
+          command: scp -o "StrictHostKeyChecking no" -r ./apps/dragpaper-web/* ci@engine.fragment0.com:/home/web/dragpaper-web
       
       - run:
           name: Deploy2
-          command: ssh -o "StrictHostKeyChecking no" ci@xxxiin.com 'cd /home/web/dragpaper-web && yarn && env HOME=/home/pm2 pm2 restart dragpaper-web'
+          command: ssh -o "StrictHostKeyChecking no" ci@engine.fragment0.com 'cd /home/web/dragpaper-web && yarn && env HOME=/home/pm2 pm2 restart dragpaper-web'
 
       - save_cache:
           paths:
