@@ -13,7 +13,7 @@ export interface ReadResult {
 export const asyncReadability = async (html: string, url?: string): Promise<ReadResult> => {
   return new Promise<ReadResult>((resolve, reject) => {
     const result = juice(html, {
-      href: url || '',
+      url: url || '',
     })
     resolve({
       content: result.content,
